@@ -2,6 +2,7 @@ package com.kenji.goods.web;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kenji.goods.config.Config;
 import com.kenji.goods.vo.Goods;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -27,7 +28,7 @@ public class GoodsController {
         String ret = null;
         List<Goods> goods = new ArrayList<>();
         HashMap result = new HashMap();
-//        String url = "http://localhost:8080/invoke?serviceName=USER";
+//        String url = Config.registryHost + "/invoke?serviceName=USER";
         String url = "http://127.0.0.1:7001";
         try {
             CloseableHttpClient client = HttpClients.createDefault();
