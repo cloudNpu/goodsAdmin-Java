@@ -2,19 +2,21 @@ package com.kenji.goods.web;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kenji.goods.config.Config;
 import com.kenji.goods.vo.Goods;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +25,12 @@ import java.util.List;
 @RequestMapping("/goods")
 public class GoodsController {
 
+    @Autowired
+    private HttpServletRequest request;
+
+
     @GetMapping
-    public ResponseEntity<Object> findAll() {
+    public ResponseEntity<Object> findAll(@RequestHeader(value = "token") String token) {
         String ret = null;
         List<Goods> goods = new ArrayList<>();
         HashMap result = new HashMap();
@@ -33,6 +39,7 @@ public class GoodsController {
         try {
             CloseableHttpClient client = HttpClients.createDefault();
             HttpGet httpGet = new HttpGet(url);
+            httpGet.addHeader("token", token);
             CloseableHttpResponse response = client.execute(httpGet);
 
             if (response.getStatusLine().getStatusCode() == org.apache.http.HttpStatus.SC_OK) {
@@ -43,7 +50,6 @@ public class GoodsController {
                 ObjectMapper mapper = new ObjectMapper();
                 HashMap resHM = mapper.readValue(ret, new TypeReference<HashMap>() {
                 });
-                System.out.println(resHM);
                 result.put("port", resHM.get("port"));
 
                 List<HashMap> resObj = (List<HashMap>) resHM.get("data");
@@ -72,7 +78,7 @@ public class GoodsController {
                     }
                     goods.add(g);
                 }
-                result.put("data",goods);
+                result.put("data", goods);
             }
             return ResponseEntity.ok().body(result);
         } catch (Exception e) {
